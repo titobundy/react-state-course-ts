@@ -16,13 +16,14 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const hideNotification = () => setMessage(null);
   const showNotification = (message: string) => {
     setMessage(message);
-    setTimeout(hideNotification, 5000);
+    setTimeout(hideNotification, 3000);
   };
 
   return (
     <NotificationContext.Provider value={{ message, hideNotification, showNotification }}>
       {children}
     </NotificationContext.Provider>
+  )
 };
 
 export default NotificationProvider;
