@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 
 type Todo = {
     id: number;
@@ -11,8 +12,8 @@ type TodoStore = {
     removeTodo: (id: number) => void;
 }
 
-export const useTodoStore = create<TodoStore>((set): TodoStore => ({
+export const useTodoStore = create<TodoStore>()(devtools((set) => ({
     todos: [],
     addTodo: (text) => set(state => ({ todos: [...state.todos, { id: state.todos.length + 1, text }] })),
     removeTodo: (id) => set(state => ({ todos: state.todos.filter(todo => todo.id !== id) })),
-}));
+})));
