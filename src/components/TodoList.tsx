@@ -47,9 +47,10 @@ const todoReducer = (state: State, action: Action): State => {
 const TodoList: React.FC = () => {
   const [state, dispatch] = useReducer(todoReducer, initialState);
   const [text, setText] = useState('');
+  const unkwonEmoji = '🤷‍♂️';
 
   const handleAddTodo = (text: string) => {
-    const mapppedText = emojiMap[text.toLowerCase()] || text;
+    const mapppedText = emojiMap[text.toLowerCase()] || `${text} ${unkwonEmoji}`;
     if (mapppedText.trim()) {
       dispatch({ type: 'ADD_TODO', payload: mapppedText });
       setText('');
@@ -66,13 +67,26 @@ const TodoList: React.FC = () => {
     <div>
       <em>Made with useReducer</em>
       <h1>Emoji Todo List</h1>
-      <input
-        type='text'
-        value={text}
-        onKeyDown={handleKeyDown}
-        onChange={(e) => setText(e.target.value)}
-        placeholder='Add a new todo'
-      />
+    <datalist id="emoji-options">
+      {Object.keys(emojiMap).map((key) => (
+        <option key={key} value={key}>
+        {emojiMap[key]} {key}
+        </option>
+      ))}
+    </datalist>
+    <input
+      type='text'
+      value={text}
+      onKeyDown={handleKeyDown}
+      onChange={(e) => {
+        setText(e.target.value);
+        if (Object.keys(emojiMap).includes(e.target.value.toLowerCase())) {
+            handleAddTodo(e.target.value);
+        }
+      }}
+      placeholder='Add a new todo'
+      list="emoji-options"
+    />
       <ul>
         {state.todos.map((todo) => (
           <li
