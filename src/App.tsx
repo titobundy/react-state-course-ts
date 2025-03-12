@@ -1,7 +1,29 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+
+interface StateMachineConfig<StateType, StepNames extends string> {
+  initialStep: StepNames;
+  steps: {
+    [key in StepNames]: {
+      canAdvance: (state: StateType) => boolean;
+    }
+  },
+  views: {
+    [key in StepNames]: React.ComponentType<{
+      state: StateType;
+      setState: React.Dispatch<React.SetStateAction<StateType>>;
+    }>
+  }
+}
+
+type WizardState = {
+  name: string;
+  age: number;
+}
+
+type StepNames = 'step1' | 'step2' | 'confirmation';
 
 function App() {
   const [count, setCount] = useState(0)
