@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+
+import { useState } from 'react'
 
 interface StateMachineConfig<StateType, StepNames extends string> {
   initialStep: StepNames;
@@ -25,7 +23,7 @@ type WizardState = {
 
 type StepNames = 'step1' | 'step2' | 'confirmation';
 
-const StateMachineConfig: StateMachineConfig<WizardState, StepNames> = {
+const stateMachineConfig: StateMachineConfig<WizardState, StepNames> = {
   initialStep: 'step1',
   steps: {
     step1: {
@@ -71,33 +69,44 @@ const StateMachineConfig: StateMachineConfig<WizardState, StepNames> = {
   },
 };
 
-function App() {
-  const [count, setCount] = useState(0);
+const getStepView = <T, V extends string>(
+  config: StateMachineConfig<T, V>,
+  stepName: V
+): React.ComponentType<{
+  state: T;
+  setState: React.Dispatch<React.SetStateAction<T>>;
+}> => config.views[stepName];
 
-  return (
-    <>
-      <div>
-        <a href='https://vite.dev' target='_blank'>
-          <img src={viteLogo} className='logo' alt='Vite logo' />
-        </a>
-        <a href='https://react.dev' target='_blank'>
-          <img src={reactLogo} className='logo react' alt='React logo' />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className='card'>
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className='read-the-docs'>
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+const StateMachineWizard = () => {
+  const [wizardState, setWizardState] = useState<WizardState>({
+    name: '',
+    age: 0,
+  });
+  const [currentStep, setCurrentStep] = useState<StepNames>(
+    stateMachineConfig.initialStep
   );
-}
 
-export default App;
+  const StepComponent = getStepView(stateMachineConfig, currentStep);
+  const handleNext = () => {
+    const canAdvance = stateMachineConfig.steps[currentStep].canAdvance(wizardState);
+    
+    if (canAdvance) {
+      if (currentStep === "step1") setCurrentStep("step2");
+      else if (currentStep === "step2") setCurrentStep("confirmation");
+    } else {
+      alert("You can't move forward yet.");
+    }
+  };
+  return (
+    <section>
+      <h1>✨ State Machine Wizard ✨</h1>
+      <StepComponent state={wizardState} setState={setWizardState} />
+      {
+        currentStep !== "confirmation" && (
+          <button onClick={handleNext}>Next</button>
+        )
+      }
+    </section>
+  );
+};
+export default StateMachineWizard;
